@@ -64,7 +64,8 @@ notebook/analiza.ipynb
 ```
 
 Notebook pobiera najnowsze dane, przetwarza je i zapisuje do:
-
+## UWAGA
+JEŻELI MASZ PROBLEM Z DZIAŁANIEM NOTEBOOKA, SPRAWDŹ NA JAKIM KERNELU PYTHONA DZIAŁA (POWINIEN UŻYWAĆ PYTHON ZE SWOJEGO ŚRODOWISKA, NIE GLOBALNEGO!)
 ```text
 data/final_dataset.csv
 ```
