@@ -38,7 +38,7 @@ class ModelFrame(ctk.CTkFrame):
         # ======================
 
         metrics_text = f"""
-Model trenowany na danych bez kryzysu (do 2020 roku)
+Model trenowany na danych bez kryzysu (do 2020 roku), zastosowano regresję liniową
 
 ------------------------------------------------
 
