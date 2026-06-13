@@ -1,0 +1,17 @@
+pandas
+numpy
+eurostat
+matplotlib
+seaborn
+plotly
+jupyterlab
+scikit-learn
+notebook
+openpyxl
+ipykernel
+customtkinter
+nbformat
+joblib
+pyinstaller
+kaleido
+pillow
