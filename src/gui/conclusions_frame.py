@@ -1,5 +1,7 @@
 import customtkinter as ctk
 
+from gui.styles import *
+
 
 class ConclusionsFrame(ctk.CTkFrame):
 
@@ -7,20 +9,65 @@ class ConclusionsFrame(ctk.CTkFrame):
 
         super().__init__(master)
 
+        # =====================================
+        # TYTUŁ
+        # =====================================
+
         title = ctk.CTkLabel(
             self,
             text="Wnioski końcowe",
-            font=("Arial", 24, "bold")
+            font=TITLE_FONT
         )
 
         title.pack(
-            pady=20
+            anchor="w",
+            padx=PAGE_PADX,
+            pady=(25, 5)
+        )
+
+        # =====================================
+        # OPIS
+        # =====================================
+
+        description = ctk.CTkLabel(
+            self,
+            text=(
+                "Podsumowanie najważniejszych rezultatów uzyskanych "
+                "podczas analizy danych dotyczących udziału OZE, "
+                "cen energii elektrycznej oraz czynników ekonomicznych "
+                "w krajach Europy."
+            ),
+            justify="left",
+            wraplength=900,
+            text_color=DESCRIPTION_COLOR,
+            font=TEXT_FONT
+        )
+
+        description.pack(
+            anchor="w",
+            padx=PAGE_PADX,
+            pady=(0, 20)
+        )
+
+        # =====================================
+        # PANEL
+        # =====================================
+
+        panel = ctk.CTkFrame(
+            self,
+            corner_radius=CARD_CORNER_RADIUS
+        )
+
+        panel.pack(
+            fill="both",
+            expand=True,
+            padx=PAGE_PADX,
+            pady=(0, PAGE_PADY)
         )
 
         textbox = ctk.CTkTextbox(
-            self,
-            width=1000,
-            height=700
+            panel,
+            font=TEXT_FONT
         )
 
         textbox.pack(
@@ -31,92 +78,83 @@ class ConclusionsFrame(ctk.CTkFrame):
         )
 
         conclusions_text = """
-CEL PROJEKTU
+══════════════════════════════════════════════════════
+                     CEL PROJEKTU
+══════════════════════════════════════════════════════
 
-Celem projektu było zbadanie zależności pomiędzy udziałem energii
-ze źródeł odnawialnych (OZE) a cenami energii elektrycznej
-w krajach europejskich.
+Celem projektu było zbadanie zależności pomiędzy udziałem
+energii ze źródeł odnawialnych (OZE) a cenami energii
+elektrycznej w krajach Europy.
 
-W analizie wykorzystano dane Eurostatu dotyczące:
+W analizie wykorzystano dane dotyczące:
+
 • udziału OZE,
 • cen energii elektrycznej,
 • inflacji,
 • PKB per capita.
 
-------------------------------------------------------------
+══════════════════════════════════════════════════════
+                NAJWAŻNIEJSZE WNIOSKI
+══════════════════════════════════════════════════════
 
-ANALIZA ZALEŻNOŚCI
+✓ Sam udział OZE nie wyjaśnia zmian cen energii.
 
-Początkowa analiza wykorzystująca wyłącznie udział OZE
-nie pozwoliła uzyskać satysfakcjonujących wyników.
+✓ Ceny energii są zjawiskiem wieloczynnikowym.
 
-Wskazuje to, że ceny energii elektrycznej są zjawiskiem
-wieloczynnikowym i zależą od wielu elementów gospodarczych
-oraz politycznych.
+✓ Dodanie inflacji oraz PKB per capita znacząco
+  poprawiło skuteczność modeli.
 
-------------------------------------------------------------
+✓ Największy wpływ na model miały zmienne ekonomiczne.
 
-ROZSZERZENIE MODELU
+✓ Modele trenowane na danych sprzed kryzysu
+  osiągały bardziej stabilne wyniki.
 
-Po dodaniu inflacji oraz PKB per capita
-uzyskano znaczącą poprawę jakości modeli.
+══════════════════════════════════════════════════════
+              KRYZYS ENERGETYCZNY
+══════════════════════════════════════════════════════
 
-Największy wpływ na skuteczność predykcji
-miało uwzględnienie czynników ekonomicznych,
-a nie wyłącznie energetycznych.
+Lata 2021–2023 znacząco zaburzyły wcześniejsze zależności
+ekonomiczne.
 
-------------------------------------------------------------
+Model trenowany wyłącznie na danych historycznych
+(do 2020 roku) uzyskał lepsze wyniki predykcyjne.
 
-WPŁYW KRYZYSU ENERGETYCZNEGO
+══════════════════════════════════════════════════════
+                 PREDYKCJA
+══════════════════════════════════════════════════════
 
-Lata 2021–2023 zostały potraktowane jako okres kryzysu
-energetycznego.
+Prognozy wykonano przy użyciu regresji liniowej.
 
-Modele trenowane wyłącznie na danych sprzed kryzysu
-osiągały bardziej stabilne wyniki predykcyjne.
+Model umożliwia prognozowanie cen energii
+na kolejne 5 lat dla wybranego kraju.
 
-Oznacza to, że wydarzenia geopolityczne
-oraz gwałtowne wzrosty cen surowców
-znacząco zaburzyły standardowe zależności ekonomiczne.
-
-------------------------------------------------------------
-
-PREDYKCJA CEN ENERGII
-
-Do prognoz wykorzystano model regresji liniowej
-wytrenowany na danych bez okresu kryzysowego.
-
-Prognozy zostały wykonane dla kolejnych 5 lat,
-przyjmując rzeczywiste dane z 2024 roku
-jako punkt startowy.
-
-------------------------------------------------------------
-
-OGRANICZENIA PROJEKTU
-
-Najważniejsze ograniczenia projektu:
+══════════════════════════════════════════════════════
+                OGRANICZENIA
+══════════════════════════════════════════════════════
 
 • ograniczona liczba zmiennych,
-• brak danych dotyczących cen gazu,
-• brak danych dotyczących emisji CO₂,
-• brak danych dotyczących importu energii,
+
+• brak cen gazu,
+
+• brak emisji CO₂,
+
+• brak danych o imporcie energii,
+
 • uproszczone założenia prognostyczne.
 
-------------------------------------------------------------
+══════════════════════════════════════════════════════
+                 PODSUMOWANIE
+══════════════════════════════════════════════════════
 
-PODSUMOWANIE
+Przeprowadzona analiza wykazała, że ceny energii
+elektrycznej zależą od wielu czynników gospodarczych
+i energetycznych.
 
-Przeprowadzona analiza pokazała,
-że ceny energii elektrycznej w Europie
-są efektem złożonych zależności
-gospodarczych i energetycznych.
+Najlepsze rezultaty uzyskano po uwzględnieniu
+zmiennych ekonomicznych obok udziału OZE.
 
-Sam udział OZE nie wyjaśnia w pełni
-zmienności cen energii.
-
-Uwzględnienie dodatkowych czynników
-ekonomicznych pozwala uzyskać
-znacznie dokładniejsze modele predykcyjne.
+Uzyskany model może stanowić punkt wyjścia do
+dalszych analiz i rozbudowy o dodatkowe dane.
 """
 
         textbox.insert(

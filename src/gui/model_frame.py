@@ -1,12 +1,12 @@
 import customtkinter as ctk
-
 import matplotlib.pyplot as plt
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from data_loader import load_data
-
 from model_info import get_model_info
+
+from gui.styles import *
 
 
 class ModelFrame(ctk.CTkFrame):
@@ -19,33 +19,89 @@ class ModelFrame(ctk.CTkFrame):
 
         model_info = get_model_info(df)
 
-        # ======================
-        # Tytuł
-        # ======================
+        # ==================================================
+        # TYTUŁ
+        # ==================================================
 
         title = ctk.CTkLabel(
             self,
-            text="Informacje o modelu",
-            font=("Arial", 24, "bold")
+            text="Ocena modelu regresji liniowej",
+            font=TITLE_FONT
         )
 
         title.pack(
-            pady=20
+            anchor="w",
+            padx=PAGE_PADX,
+            pady=(25, 5)
         )
 
-        # ======================
-        # Metryki modelu
-        # ======================
+        # ==================================================
+        # OPIS
+        # ==================================================
+
+        description = ctk.CTkLabel(
+            self,
+            text=(
+                "Model regresji liniowej został wytrenowany na danych "
+                "historycznych z lat do 2020 roku. "
+                "Jakość modelu oceniono na podstawie 50 losowych podziałów "
+                "zbioru danych na część treningową i testową. "
+                "Poniżej przedstawiono średnie wartości metryk oraz "
+                "wpływ poszczególnych zmiennych na przewidywaną cenę energii."
+            ),
+            justify="left",
+            wraplength=950,
+            font=TEXT_FONT,
+            text_color=DESCRIPTION_COLOR
+        )
+
+        description.pack(
+            anchor="w",
+            padx=PAGE_PADX,
+            pady=(0, 20)
+        )
+
+        # ==================================================
+        # PANEL METRYK
+        # ==================================================
+
+        metrics_frame = ctk.CTkFrame(
+            self,
+            corner_radius=CARD_CORNER_RADIUS
+        )
+
+        metrics_frame.pack(
+            fill="x",
+            padx=PAGE_PADX,
+            pady=(0, 20)
+        )
+
+        metrics_title = ctk.CTkLabel(
+            metrics_frame,
+            text="Metryki jakości modelu",
+            font=SUBTITLE_FONT
+        )
+
+        metrics_title.pack(
+            anchor="w",
+            padx=20,
+            pady=(15, 10)
+        )
 
         metrics_text = f"""
-Model trenowany na danych bez kryzysu (do 2020 roku), zastosowano regresję liniową
+Model: Regresja liniowa
 
-------------------------------------------------
+Liczba powtórzeń: 50
+
+Dane treningowe:
+Lata do 2020 roku
+
+──────────────────────────────
 
 Średnie R²:
 {model_info['r2_mean']:.3f}
 
-Odchylenie standardowe R²:
+Odchylenie standardowe:
 {model_info['r2_std']:.3f}
 
 Minimalne R²:
@@ -54,7 +110,7 @@ Minimalne R²:
 Maksymalne R²:
 {model_info['r2_max']:.3f}
 
-------------------------------------------------
+──────────────────────────────
 
 Średnie MAE:
 {model_info['mae_mean']:.4f}
@@ -63,50 +119,76 @@ Maksymalne R²:
 {model_info['rmse_mean']:.4f}
 """
 
-        metrics_label = ctk.CTkLabel(
+        metrics = ctk.CTkTextbox(
+            metrics_frame,
+            height=250,
+            font=TEXT_FONT
+        )
+
+        metrics.pack(
+            fill="x",
+            padx=20,
+            pady=(0, 20)
+        )
+
+        metrics.insert(
+            "1.0",
+            metrics_text
+        )
+
+        metrics.configure(
+            state="disabled"
+        )
+
+        # ==================================================
+        # WYKRES
+        # ==================================================
+
+        chart_frame = ctk.CTkFrame(
             self,
-            text=metrics_text,
-            justify="left"
+            corner_radius=CARD_CORNER_RADIUS
         )
-
-        metrics_label.pack(
-            pady=10
-        )
-
-        # ======================
-        # Dane do wykresu
-        # ======================
-
-        coeff_df = model_info["coefficients"]
-
-        feature_names = {
-            "oze_share": "Udział OZE",
-            "inflation": "Inflacja",
-            "gdp_per_capita": "PKB per capita",
-            "year": "Rok"
-        }
-
-        labels = [
-            feature_names[f]
-            for f in coeff_df["Feature"]
-        ]
-
-        # ======================
-        # Ramka wykresu
-        # ======================
-
-        chart_frame = ctk.CTkFrame(self)
 
         chart_frame.pack(
             fill="both",
             expand=True,
-            padx=20,
-            pady=20
+            padx=PAGE_PADX,
+            pady=(0, PAGE_PADY)
         )
 
-        # ======================
-        # Wykres
-        # ======================
+        chart_title = ctk.CTkLabel(
+            chart_frame,
+            text="Wpływ zmiennych na model",
+            font=SUBTITLE_FONT
+        )
+
+        chart_title.pack(
+            anchor="w",
+            padx=20,
+            pady=(15, 10)
+        )
+
+        coeff_df = model_info["coefficients"]
+
+        feature_names = {
+
+            "oze_share": "Udział OZE",
+
+            "inflation": "Inflacja",
+
+            "gdp_per_capita": "PKB per capita",
+
+            "year": "Rok"
+
+        }
+
+        labels = [
+
+            feature_names[f]
+
+            for f in coeff_df["Feature"]
+
+        ]
 
         fig, ax = plt.subplots(
             figsize=(8, 4)
@@ -118,18 +200,12 @@ Maksymalne R²:
         )
 
         ax.set_title(
-            "Wpływ zmiennych ekonomicznych na cenę energii"
+            "Wpływ zmiennych ekonomicznych"
         )
 
         ax.set_xlabel(
-            "Udział w modelu (%)"
+            "Wpływ (%)"
         )
-
-        ax.set_ylabel(
-            "Zmienne"
-        )
-
-        # wartości na końcach słupków
 
         for i, value in enumerate(
             coeff_df["Percent"]
@@ -144,10 +220,6 @@ Maksymalne R²:
 
         plt.tight_layout()
 
-        # ======================
-        # Osadzenie wykresu
-        # ======================
-
         canvas = FigureCanvasTkAgg(
             fig,
             master=chart_frame
@@ -157,5 +229,7 @@ Maksymalne R²:
 
         canvas.get_tk_widget().pack(
             fill="both",
-            expand=True
+            expand=True,
+            padx=20,
+            pady=(0, 20)
         )

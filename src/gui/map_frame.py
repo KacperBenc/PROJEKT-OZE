@@ -1,12 +1,13 @@
 import customtkinter as ctk
 
 from PIL import Image
-
 import webbrowser
-
-from map_generator import generate_map
 from pathlib import Path
+
 from data_loader import load_data
+from map_generator import generate_map
+
+from gui.styles import *
 
 
 class MapFrame(ctk.CTkFrame):
@@ -17,28 +18,114 @@ class MapFrame(ctk.CTkFrame):
 
         self.df = load_data()
 
+        # =====================================
+        # TYTUŁ
+        # =====================================
+
         title = ctk.CTkLabel(
             self,
             text="Mapa Europy",
-            font=("Arial", 24, "bold")
+            font=TITLE_FONT
         )
 
         title.pack(
-            pady=20
+            anchor="w",
+            padx=PAGE_PADX,
+            pady=(25, 5)
+        )
+
+        # =====================================
+        # OPIS
+        # =====================================
+
+        description = ctk.CTkLabel(
+            self,
+            text=(
+                "Mapa przedstawia przestrzenne zróżnicowanie wybranego "
+                "wskaźnika w krajach Europy. "
+                "Kolor każdego państwa odpowiada wartości analizowanej "
+                "zmiennej dla wybranego roku. "
+                "Opcjonalnie można otworzyć interaktywną wersję mapy "
+                "w przeglądarce internetowej."
+            ),
+            justify="left",
+            wraplength=900,
+            text_color=DESCRIPTION_COLOR,
+            font=TEXT_FONT
+        )
+
+        description.pack(
+            anchor="w",
+            padx=PAGE_PADX,
+            pady=(0, 20)
+        )
+
+        # =====================================
+        # PANEL PARAMETRÓW
+        # =====================================
+
+        controls = ctk.CTkFrame(
+            self,
+            corner_radius=CARD_CORNER_RADIUS
+        )
+
+        controls.pack(
+            fill="x",
+            padx=PAGE_PADX,
+            pady=(0, 20)
+        )
+
+        controls_title = ctk.CTkLabel(
+            controls,
+            text="Parametry analizy",
+            font=SUBTITLE_FONT
+        )
+
+        
+
+        controls_title.pack(
+            anchor="w",
+            padx=20,
+            pady=(15, 10)
+        )
+
+        metric_label = ctk.CTkLabel(
+            controls,
+            text="Wskaźnik:",
+            font=TEXT_FONT
+        )
+
+        metric_label.pack(
+            anchor="w",
+            padx=20
         )
 
         self.metric_menu = ctk.CTkOptionMenu(
-            self,
+            controls,
             values=[
                 "OZE",
                 "Energia",
                 "Inflacja",
                 "PKB"
-            ]
+            ],
+            width=220
         )
 
         self.metric_menu.pack(
-            pady=10
+            anchor="w",
+            padx=20,
+            pady=(5, 15)
+        )
+
+        year_label = ctk.CTkLabel(
+            controls,
+            text="Rok:",
+            font=TEXT_FONT
+        )
+
+        year_label.pack(
+            anchor="w",
+            padx=20
         )
 
         years = sorted(
@@ -46,50 +133,82 @@ class MapFrame(ctk.CTkFrame):
         )
 
         self.year_menu = ctk.CTkOptionMenu(
-            self,
+            controls,
             values=[
                 str(y)
                 for y in years
-            ]
+            ],
+            width=220
         )
 
         self.year_menu.pack(
-            pady=10
+            anchor="w",
+            padx=20,
+            pady=(5, 15)
         )
 
         self.browser_var = ctk.BooleanVar()
 
         browser_checkbox = ctk.CTkCheckBox(
-            self,
+            controls,
             text="Otwórz interaktywną mapę w przeglądarce",
             variable=self.browser_var
         )
 
         browser_checkbox.pack(
-            pady=10
+            anchor="w",
+            padx=20,
+            pady=(0, 15)
         )
 
         show_button = ctk.CTkButton(
-            self,
-            text="Pokaż mapę",
-            command=self.show_map
+            controls,
+            text="Generuj mapę",
+            command=self.show_map,
+            font=BUTTON_FONT,
+            height=40
         )
 
         show_button.pack(
-            pady=10
+            padx=20,
+            pady=(0, 20)
         )
 
-        self.image_label = ctk.CTkLabel(
+        # =====================================
+        # PANEL WYNIKÓW
+        # =====================================
+
+        self.chart_frame = ctk.CTkFrame(
             self,
-            text=""
+            corner_radius=CARD_CORNER_RADIUS
         )
 
-        self.image_label.pack(
+        self.chart_frame.pack(
+            fill="both",
             expand=True,
-            pady=20
+            padx=PAGE_PADX,
+            pady=(0, PAGE_PADY)
         )
+
+    # =====================================
 
     def show_map(self):
+
+        for widget in self.chart_frame.winfo_children():
+
+            widget.destroy()
+
+        chart_title = ctk.CTkLabel(
+            self.chart_frame,
+            text="Wynik analizy",
+            font=SUBTITLE_FONT
+        )
+
+        chart_title.pack(
+            anchor="w",
+            padx=20,
+            pady=(15, 10)
+        )
 
         metric = self.metric_menu.get()
 
@@ -143,11 +262,17 @@ class MapFrame(ctk.CTkFrame):
             size=(900, 600)
         )
 
-        self.image_label.configure(
+        self.image_label = ctk.CTkLabel(
+            self.chart_frame,
+            text="",
             image=image
         )
 
         self.image_label.image = image
+
+        self.image_label.pack(
+            pady=10
+        )
 
         if self.browser_var.get():
 

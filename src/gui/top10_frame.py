@@ -1,12 +1,12 @@
 import customtkinter as ctk
-
 import matplotlib.pyplot as plt
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from data_loader import load_data
-
 from top10 import get_top10
+
+from gui.styles import *
 
 
 class Top10Frame(ctk.CTkFrame):
@@ -17,93 +17,194 @@ class Top10Frame(ctk.CTkFrame):
 
         self.df = load_data()
 
+        # =====================================
+        # TYTUŁ
+        # =====================================
+
         title = ctk.CTkLabel(
             self,
-            text="TOP 10 krajów",
-            font=("Arial", 24, "bold")
+            text="Ranking TOP 10 krajów",
+            font=TITLE_FONT
         )
 
         title.pack(
-            pady=20
+            anchor="w",
+            padx=PAGE_PADX,
+            pady=(25, 5)
         )
 
-        # --------------------
-        # wybór wskaźnika
-        # --------------------
+        # =====================================
+        # OPIS
+        # =====================================
+
+        description = ctk.CTkLabel(
+            self,
+            text=(
+                "Ranking umożliwia porównanie dziesięciu krajów "
+                "osiągających najwyższe lub najniższe wartości "
+                "wybranego wskaźnika w określonym roku."
+            ),
+            justify="left",
+            wraplength=900,
+            text_color=DESCRIPTION_COLOR,
+            font=TEXT_FONT
+        )
+
+        description.pack(
+            anchor="w",
+            padx=PAGE_PADX,
+            pady=(0, 20)
+        )
+
+        # =====================================
+        # PANEL PARAMETRÓW
+        # =====================================
+
+        controls = ctk.CTkFrame(
+            self,
+            corner_radius=CARD_CORNER_RADIUS
+        )
+
+        controls.pack(
+            fill="x",
+            padx=PAGE_PADX,
+            pady=(0, 20)
+        )
+
+        controls_title = ctk.CTkLabel(
+            controls,
+            text="Parametry analizy",
+            font=SUBTITLE_FONT
+        )
+
+        controls_title.pack(
+            anchor="w",
+            padx=20,
+            pady=(15, 10)
+        )
+
+        # ----------------------------
+
+        metric_label = ctk.CTkLabel(
+            controls,
+            text="Wskaźnik:",
+            font=TEXT_FONT
+        )
+
+        metric_label.pack(
+            anchor="w",
+            padx=20
+        )
 
         self.metric_menu = ctk.CTkOptionMenu(
-            self,
+            controls,
             values=[
                 "OZE",
                 "Energia",
                 "Inflacja",
                 "PKB"
-            ]
+            ],
+            width=220
         )
 
         self.metric_menu.pack(
-            pady=10
+            anchor="w",
+            padx=20,
+            pady=(5, 15)
         )
 
-        # --------------------
-        # wybór roku
-        # --------------------
+        # ----------------------------
+
+        year_label = ctk.CTkLabel(
+            controls,
+            text="Rok:",
+            font=TEXT_FONT
+        )
+
+        year_label.pack(
+            anchor="w",
+            padx=20
+        )
 
         years = sorted(
-            self.df["year"]
-            .unique()
+            self.df["year"].unique()
         )
 
         self.year_menu = ctk.CTkOptionMenu(
-            self,
+            controls,
             values=[
                 str(year)
                 for year in years
-            ]
+            ],
+            width=220
         )
 
         self.year_menu.pack(
-            pady=10
+            anchor="w",
+            padx=20,
+            pady=(5, 15)
         )
+
+        # ----------------------------
+
+        order_label = ctk.CTkLabel(
+            controls,
+            text="Rodzaj rankingu:",
+            font=TEXT_FONT
+        )
+
+        order_label.pack(
+            anchor="w",
+            padx=20
+        )
+
         self.order_menu = ctk.CTkOptionMenu(
-        self,
-        values=[
-            "Największe",
-            "Najmniejsze"
-        ]
-    )
+            controls,
+            values=[
+                "Największe",
+                "Najmniejsze"
+            ],
+            width=220
+        )
 
         self.order_menu.pack(
-            pady=10
+            anchor="w",
+            padx=20,
+            pady=(5, 15)
         )
-        # --------------------
-        # przycisk
-        # --------------------
+
+        # ----------------------------
 
         button = ctk.CTkButton(
-            self,
-            text="Pokaż ranking",
-            command=self.show_top10
+            controls,
+            text="Generuj ranking",
+            command=self.show_top10,
+            font=BUTTON_FONT,
+            height=40
         )
 
         button.pack(
-            pady=20
+            padx=20,
+            pady=(0, 20)
         )
 
-        # --------------------
-        # miejsce na wykres
-        # --------------------
+        # =====================================
+        # PANEL WYKRESU
+        # =====================================
 
         self.chart_frame = ctk.CTkFrame(
-            self
+            self,
+            corner_radius=CARD_CORNER_RADIUS
         )
 
         self.chart_frame.pack(
             fill="both",
             expand=True,
-            padx=20,
-            pady=20
+            padx=PAGE_PADX,
+            pady=(0, PAGE_PADY)
         )
+
+    # =====================================
 
     def show_top10(self):
 
@@ -111,9 +212,19 @@ class Top10Frame(ctk.CTkFrame):
 
             widget.destroy()
 
-        selected_metric = (
-            self.metric_menu.get()
+        chart_title = ctk.CTkLabel(
+            self.chart_frame,
+            text="Wynik analizy",
+            font=SUBTITLE_FONT
         )
+
+        chart_title.pack(
+            anchor="w",
+            padx=20,
+            pady=(15, 10)
+        )
+
+        selected_metric = self.metric_menu.get()
 
         selected_year = int(
             self.year_menu.get()
@@ -128,18 +239,19 @@ class Top10Frame(ctk.CTkFrame):
             "Inflacja": "inflation",
 
             "PKB": "gdp_per_capita"
+
         }
 
         column = metric_map[
             selected_metric
         ]
-        selected_order = (
-            self.order_menu.get()
-        )
+
+        selected_order = self.order_menu.get()
 
         ascending = (
             selected_order == "Najmniejsze"
         )
+
         top10 = get_top10(
             self.df,
             selected_year,
@@ -161,14 +273,21 @@ class Top10Frame(ctk.CTkFrame):
         ax.set_title(
             f"TOP 10 krajów - {selected_metric} ({selected_year})"
         )
+
         axis_labels = {
+
             "OZE": "Udział OZE w miksie energetycznym (%)",
+
             "Energia": "Cena energii (EUR/kWh)",
-            "Inflacja": "Inflacja dla kraju (%)",
+
+            "Inflacja": "Inflacja (%)",
+
             "PKB": "PKB per capita (EUR)"
+
         }
+
         ax.set_xlabel(
-             axis_labels[selected_metric]
+            axis_labels[selected_metric]
         )
 
         for i, value in enumerate(
@@ -193,5 +312,7 @@ class Top10Frame(ctk.CTkFrame):
 
         canvas.get_tk_widget().pack(
             fill="both",
-            expand=True
+            expand=True,
+            padx=20,
+            pady=(0, 20)
         )
